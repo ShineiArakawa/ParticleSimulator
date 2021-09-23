@@ -1,3 +1,4 @@
+from src.DatReader import writeDauFile
 from src.Environment import Cube, Environment
 from src.Viewer import saveCurrentParticle
 from src.ParticleModel import ParticleModel
@@ -14,7 +15,7 @@ import numpy as np
 
 
 class Physics:
-    FPS = 240
+    FPS = 1000
     DURATION = 1000 / FPS
     COEFFICIENT_OF_RESTITUTION = 1.0
 
@@ -50,7 +51,8 @@ class Physics:
         for iter in tqdm(range(maxIter)):
             self.__update()
             saveCurrentParticle(particleModel=self.__particleModel, boxSize=boxSize,
-                                pathSave=pathSave+f'/iter_{iter}.png')
+                               pathSave=pathSave+f'/iter_{iter}.png')
+            #writeDauFile(iter=iter, particleModel=self.__particleModel)
 
     def __reboundWithOtherParticle(self, i: int, j: int) -> tuple:
         iCoord = self.__particleModel.getParticleCoord(i)

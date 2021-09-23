@@ -44,7 +44,7 @@ class ParticleModel:
         particle: Particle = self.__particles[index]
         radius = particle.radius
         return radius
-        
+
     def getParticleMass(self, index: int) -> np.float64:
         particle: Particle = self.__particles[index]
         mass = particle.mass
@@ -81,7 +81,7 @@ class Particle:
     @velocity.setter
     def velocity(self, velocity: np.ndarray):
         self.__velocity = velocity
-        
+
     @property
     def radius(self):
         pass
@@ -89,11 +89,11 @@ class Particle:
     @radius.getter
     def radius(self):
         return self.__radius
-    
+
     @property
     def mass(self):
         pass
-    
+
     @mass.getter
     def mass(self):
         return self.__mass

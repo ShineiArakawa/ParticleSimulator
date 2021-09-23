@@ -1,9 +1,9 @@
+from src.ParticleModel import ParticleModel
+
 import numpy as np
 import matplotlib.colors as colors
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-
-from src.ParticleModel import ParticleModel
 
 
 def saveCurrentParticle(particleModel: ParticleModel, boxSize: float, pathSave: str):
@@ -24,9 +24,10 @@ def saveCurrentParticle(particleModel: ParticleModel, boxSize: float, pathSave: 
         particleCoords = particleModel.getParticleCoord(index=iParticle)
         particleRadius = particleModel.getParticleRadius(index=iParticle)
         size = particleRadius * fact
-        #axes.scatter(particleCoords[0], particleCoords[1], particleCoords[2], s=size**2,
-        #c=lsColors[iParticle], edgecolor=lsColors[iParticle], label=lsLabels[iParticle])
-        axes.scatter(particleCoords[0], particleCoords[1], particleCoords[2], s=size**2, label=lsLabels[iParticle])
+        # axes.scatter(particleCoords[0], particleCoords[1], particleCoords[2], s=size**2,
+        # c=lsColors[iParticle], edgecolor=lsColors[iParticle], label=lsLabels[iParticle])
+        axes.scatter(particleCoords[0], particleCoords[1],
+                     particleCoords[2], s=size**2, label=lsLabels[iParticle])
 
     axes.set_xlim3d(-boxSize/2, boxSize/2)
     axes.set_ylim3d(-boxSize/2, boxSize/2)
@@ -36,5 +37,5 @@ def saveCurrentParticle(particleModel: ParticleModel, boxSize: float, pathSave: 
     axes.set_zlabel("Z")
     if nParticles < 5:
         axes.legend()
-    plt.savefig(pathSave)
+    plt.savefig(pathSave, dpi=500)
     plt.close()

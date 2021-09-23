@@ -37,7 +37,6 @@ def main(args):
     environment = Cube(width=boxSize)
     physics = Physics(particleModel=particleModel, environment=environment)
     physics.simulate(maxTime=maxTime, boxSize=boxSize)
-    physics.createGif()
 
 
 if __name__ == '__main__':
