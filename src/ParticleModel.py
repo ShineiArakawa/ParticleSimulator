@@ -1,15 +1,17 @@
+from typing import List
 import numpy as np
 from numpy.lib.twodim_base import mask_indices
 
 
 class ParticleModel:
     def __init__(self, nParticles: int, initialPositions: np.ndarray, initialVelocity: np.ndarray, radius: np.ndarray, mass: np.ndarray) -> None:
-        self.__particles = list()
+        self.__particles: List[Particle] = list()
         self.nParticles = nParticles
         for iParticle in range(nParticles):
             particle = Particle(
                 initialPosition=initialPositions[iParticle], initialVelocity=initialVelocity[iParticle], radius=radius[iParticle], mass=mass[iParticle])
             self.__particles.append(particle)
+        self.__nHitEnvironment = np.zeros(shape=nParticles)
 
     def isHit(self, i: int, j: int):
         isHit = False
@@ -49,6 +51,16 @@ class ParticleModel:
         particle: Particle = self.__particles[index]
         mass = particle.mass
         return mass
+    
+    def getNumHitWall(self, index: int) -> int:
+        return self.__nHitEnvironment[index]
+
+    def setNumHitWall(self, index: int, nHit: int) -> int:
+        self.__nHitEnvironment[index] = nHit
+        
+    def step(self, timeSpan: float):
+        for i in range(self.nParticles):
+            self.__particles[i].position = self.__particles[i].position + self.__particles[i].velocity * timeSpan
 
 
 class Particle:

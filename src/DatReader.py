@@ -39,8 +39,9 @@ def writeDauFile(iter: int, particleModel: ParticleModel):
         file.write(f'{addBlank(nParticles, 10)}\n')
         for iParticle in range(nParticles):
             coord = particleModel.getParticleCoord(index=iParticle)
+            velocity = particleModel.getParticleVelocity(index=iParticle)
             radius = particleModel.getParticleRadius(index=iParticle)
-            string = f'{addBlank(iParticle, 10)}{addBlank(radius, 15)}{addBlank(coord[0], 15)}{addBlank(coord[1], 15)}{addBlank(coord[2], 15)}\n'
+            string = f'{addBlank(iParticle, 10)}{addBlank(radius, 15)}{addBlank(coord[0], 15)}{addBlank(coord[1], 15)}{addBlank(coord[2], 15)}{addBlank(velocity[0], 15)}{addBlank(velocity[1], 15)}{addBlank(velocity[2], 15)}\n'
             file.write(string)
 
 
@@ -48,7 +49,7 @@ def addBlank(value, length: int):
     string = str(value)
     if type(value) == np.float64:
         string = '{:.5f}'.format(value)
-    
+
     string = string.rjust(length)
 
     if len(string) > length:

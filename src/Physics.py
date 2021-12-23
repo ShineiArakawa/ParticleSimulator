@@ -12,26 +12,22 @@ import re
 from tqdm import tqdm
 import itertools
 import numpy as np
+from multiprocessing import Process
 
-
-class Physics:
+class Physics(Process):
     FPS = 1000
     DURATION = 1000 / FPS
     COEFFICIENT_OF_RESTITUTION = 1.0
 
     def __init__(self, particleModel: ParticleModel, environment: Environment):
+        super(Physics, self).__init__()
         self.__particleModel = particleModel
         self.__environment = environment
 
     def __update(self):
         timeSpan = 1 / self.FPS
         nParticles = self.__particleModel.nParticles
-        for iParticle in range(nParticles):
-            coord = self.__particleModel.getParticleCoord(index=iParticle)
-            velocity = self.__particleModel.getParticleVelocity(
-                index=iParticle)
-            coord = coord + velocity * timeSpan
-            self.__particleModel.setParticleCoord(index=iParticle, coord=coord)
+        self.__particleModel.step(timeSpan=timeSpan)
 
         lsConbi = list(itertools.combinations(range(nParticles), 2))
         for conbi in lsConbi:
@@ -39,8 +35,6 @@ class Physics:
             j = conbi[1]
             isHit = self.__particleModel.isHit(i, j)
             if isHit:
-                iVelocity = self.__particleModel.getParticleVelocity(i)
-                jVelocity = self.__particleModel.getParticleVelocity(j)
                 self.__reboundWithOtherParticle(i, j)
         self.__environment.calcHitWall(particleModel=self.__particleModel)
 
@@ -50,9 +44,13 @@ class Physics:
         maxIter = maxTime * self.FPS
         for iter in tqdm(range(maxIter)):
             self.__update()
-            saveCurrentParticle(particleModel=self.__particleModel, boxSize=boxSize,
-                               pathSave=pathSave+f'/iter_{iter}.png')
-            #writeDauFile(iter=iter, particleModel=self.__particleModel)
+            for i in range(self.__particleModel.nParticles):
+                if self.__particleModel.getParticleVelocity(i)[0] > 10e8:
+                    print("iter= ", iter)
+                    quit()
+            #saveCurrentParticle(particleModel=self.__particleModel, boxSize=boxSize,
+            #                   pathSave=pathSave+f'/iter_{iter}.png')
+            writeDauFile(iter=iter, particleModel=self.__particleModel)
 
     def __reboundWithOtherParticle(self, i: int, j: int) -> tuple:
         iCoord = self.__particleModel.getParticleCoord(i)
@@ -81,23 +79,8 @@ class Physics:
             index=i, velocity=iVelocityAfter)
         self.__particleModel.setParticleVelocity(
             index=j, velocity=jVelocityAfter)
-
-    @staticmethod
-    def atoi(text):
-        return int(text) if text.isdigit() else text
-
-    @staticmethod
-    def natural_keys(text):
-        return [Physics.atoi(c) for c in re.split(r'(\d+)', text)]
-
-    def createGif(self, dirPath: str = './data', pathGif: str = './data/summary.gif'):
-        path_list = sorted(
-            glob.glob(os.path.join(*[dirPath, '*.png'])), key=Physics.natural_keys)
-        imgs = []
-
-        for i in range(len(path_list)):
-            img = Image.open(path_list[i])
-            imgs.append(img)
-
-        imgs[0].save(pathGif,
-                     save_all=True, append_images=imgs[1:], optimize=False, duration=self.DURATION, loop=0)
+        
+        energyPre = 0.5 * iMass * np.sqrt(np.sum(np.power(iVelocity, 2))) + 0.5 * jMass * np.sqrt(np.sum(np.power(jVelocity, 2)))
+        energyAfter = 0.5 * iMass * np.sqrt(np.sum(np.power(iVelocityAfter, 2))) + 0.5 * jMass * np.sqrt(np.sum(np.power(jVelocityAfter, 2)))
+        if np.abs(energyPre - energyAfter) > 0.5:
+            print(f"Error particle: pre= {energyPre}, after= {energyAfter}")
